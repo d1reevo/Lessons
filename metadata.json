@@ -1,0 +1,58 @@
+{
+  "name": "school-schedule-app",
+  "version": "1.0.0",
+  "description": "School Schedule Web Application for 8-Б Group II",
+  "author": "Student",
+  "license": "MIT",
+  "keywords": [
+    "school",
+    "schedule",
+    "timetable",
+    "react",
+    "typescript",
+    "education"
+  ],
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "config": {
+    "groupName": "8-Б",
+    "groupNumber": "Група II",
+    "schoolYear": "2025-2026"
+  },
+  "features": [
+    "Interactive daily view with live lesson tracking",
+    "Full schedule view with 4 display modes (Timeline, Cards, Classic, Compact)",
+    "Dark/Light theme support",
+    "Zoom/Meet link management per subject",
+    "LocalStorage persistence for preferences and links",
+    "Real-time countdown for current lessons",
+    "Progress bar showing day completion",
+    "Responsive design for mobile and desktop",
+    "Apple iOS-style glassmorphism design"
+  ],
+  "techStack": {
+    "framework": "React 18",
+    "language": "TypeScript",
+    "styling": "Tailwind CSS",
+    "icons": "Lucide Icons",
+    "stateManagement": "React Hooks (useState, useEffect, useMemo)"
+  },
+  "timeSlots": [
+    { "lesson": 1, "start": "09:00", "end": "09:35" },
+    { "lesson": 2, "start": "09:50", "end": "10:25" },
+    { "lesson": 3, "start": "10:40", "end": "11:15" },
+    { "lesson": 4, "start": "11:30", "end": "12:05" },
+    { "lesson": 5, "start": "12:20", "end": "12:55" },
+    { "lesson": 6, "start": "13:10", "end": "13:45" },
+    { "lesson": 7, "start": "14:00", "end": "14:35" },
+    { "lesson": 8, "start": "14:50", "end": "15:25" }
+  ],
+  "localStorageKeys": {
+    "theme": "school-schedule-theme",
+    "links": "school-schedule-links",
+    "viewMode": "school-schedule-view-mode",
+    "fullScheduleViewMode": "school-schedule-full-view-mode"
+  }
+}
