@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, List, Sun, Moon, Settings } from 'lucide-react';
-import { ViewMode, LinkStorage } from './types';
+import { ViewMode, LinkStorage, DaySchedule } from './types';
 import { SCHEDULE, STORAGE_KEYS } from './constants';
 import Dashboard from './components/Dashboard';
 import DayCard from './components/DayCard';
@@ -12,6 +12,26 @@ const App: React.FC = () => {
   const [viewMode, setViewMode] = useState<ViewMode>('daily');
   const [currentTime, setCurrentTime] = useState(new Date());
   const [links, setLinks] = useState<LinkStorage>({});
+  const [schedule, setSchedule] = useState<DaySchedule[]>(() => {
+    try {
+      const savedSchedule = localStorage.getItem(STORAGE_KEYS.schedule);
+      if (!savedSchedule) return SCHEDULE;
+      const parsed: unknown = JSON.parse(savedSchedule);
+      if (
+        Array.isArray(parsed) &&
+        parsed.length === SCHEDULE.length &&
+        parsed.every((day) =>
+          day && Array.isArray(day.lessons) && day.lessons.every((lesson: unknown) =>
+            typeof lesson === 'object' && lesson !== null &&
+            'subject' in lesson && typeof lesson.subject === 'string',
+          ),
+        )
+      ) return parsed as DaySchedule[];
+    } catch {
+      // Ignore invalid saved data and use the current default schedule.
+    }
+    return SCHEDULE;
+  });
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isDarkTheme, setIsDarkTheme] = useState(true);
   const [isLinkManagerOpen, setIsLinkManagerOpen] = useState(false);
@@ -53,6 +73,10 @@ const App: React.FC = () => {
   useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.theme, isDarkTheme ? 'dark' : 'light');
   }, [isDarkTheme]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.schedule, JSON.stringify(schedule));
+  }, [schedule]);
 
   // Update time
   useEffect(() => {
@@ -105,7 +129,7 @@ const App: React.FC = () => {
                 <Calendar size={22} className="text-white" />
               </div>
               <div>
-                <h1 className="text-lg font-bold text-white">8-Б (Група II)</h1>
+                <h1 className="text-lg font-bold text-white">8-Б (Група I)</h1>
                 <p className="text-[10px] text-indigo-400 uppercase tracking-widest font-medium">Розклад уроків</p>
               </div>
             </div>
@@ -165,11 +189,11 @@ const App: React.FC = () => {
         {viewMode === 'daily' ? (
           <>
             {/* Dashboard */}
-            <Dashboard />
+            <Dashboard schedule={schedule} />
 
             {/* Day Cards */}
             <div className="space-y-4">
-              {SCHEDULE.map((day) => (
+              {schedule.map((day) => (
                 <DayCard
                   key={day.dayName}
                   day={day}
@@ -182,7 +206,7 @@ const App: React.FC = () => {
             </div>
           </>
         ) : (
-          <FullScheduleView links={links} currentTime={currentTime} />
+          <FullScheduleView links={links} currentTime={currentTime} schedule={schedule} />
         )}
       </main>
 
@@ -190,7 +214,7 @@ const App: React.FC = () => {
       <footer className="py-6 border-t border-white/5 glass">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <p className="text-xs text-gray-500">
-            8-Б (Група II) • Розклад уроків
+            8-Б (Група I) • Розклад уроків
           </p>
         </div>
       </footer>
@@ -209,9 +233,11 @@ const App: React.FC = () => {
       <SettingsModal
         isOpen={isSettingsOpen}
         links={links}
+        schedule={schedule}
         onClose={() => setIsSettingsOpen(false)}
         onSaveLink={handleSaveLink}
         onDeleteLink={handleDeleteLink}
+        onSaveSchedule={setSchedule}
       />
     </div>
   );

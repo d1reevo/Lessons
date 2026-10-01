@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Clock } from 'lucide-react';
-import { SCHEDULE, TIME_SLOTS } from '../constants';
+import { TIME_SLOTS } from '../constants';
+import { DaySchedule } from '../types';
 import SubjectIcon from './SubjectIcon';
 
-const Dashboard: React.FC = () => {
+const Dashboard: React.FC<{ schedule: DaySchedule[] }> = ({ schedule }) => {
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
@@ -31,7 +32,10 @@ const Dashboard: React.FC = () => {
     const currentTotalMinutes = currentHours * 60 + currentMinutes;
 
     const schoolStart = 9 * 60;
-    const schoolEnd = 15 * 60 + 25;
+    const lessonCount = schedule[dayOfWeek - 1]?.lessons.length ?? TIME_SLOTS.length;
+    const lastLessonEnd = TIME_SLOTS[Math.max(lessonCount - 1, 0)]?.end ?? '15:25';
+    const [lastEndHour, lastEndMinute] = lastLessonEnd.split(':').map(Number);
+    const schoolEnd = lastEndHour * 60 + lastEndMinute;
 
     if (currentTotalMinutes < schoolStart) {
       const minutesUntilStart = schoolStart - currentTotalMinutes;
@@ -60,7 +64,7 @@ const Dashboard: React.FC = () => {
     const minutesPassed = currentTotalMinutes - schoolStart;
     const progress = Math.min(100, Math.max(0, (minutesPassed / totalSchoolMinutes) * 100));
 
-    const todaySchedule = SCHEDULE[dayOfWeek - 1];
+    const todaySchedule = schedule[dayOfWeek - 1];
     if (!todaySchedule) {
       return { 
         status: 'over' as const, 
@@ -125,7 +129,7 @@ const Dashboard: React.FC = () => {
       countdown: '',
       progress 
     };
-  }, [currentTime]);
+  }, [currentTime, schedule]);
 
   const getGradient = () => {
     switch (dashboardState.status) {

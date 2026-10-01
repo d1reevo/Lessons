@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { List, LayoutGrid, Table2, ExternalLink } from 'lucide-react';
-import { LinkStorage, ScheduleViewMode, LessonStatus } from '../types';
-import { SCHEDULE, TIME_SLOTS, DAY_INFO, STORAGE_KEYS } from '../constants';
+import { LinkStorage, ScheduleViewMode, LessonStatus, DaySchedule } from '../types';
+import { TIME_SLOTS, DAY_INFO, STORAGE_KEYS } from '../constants';
 import SubjectIcon from './SubjectIcon';
 
 interface FullScheduleViewProps {
   links: LinkStorage;
   currentTime: Date;
+  schedule: DaySchedule[];
 }
 
-const FullScheduleView: React.FC<FullScheduleViewProps> = ({ links, currentTime }) => {
+const FullScheduleView: React.FC<FullScheduleViewProps> = ({ links, currentTime, schedule }) => {
   const [viewMode, setViewMode] = useState<ScheduleViewMode>('list');
 
   const getLessonStatus = (dayIndex: number, lessonIndex: number): LessonStatus => {
@@ -65,7 +66,7 @@ const FullScheduleView: React.FC<FullScheduleViewProps> = ({ links, currentTime 
   // List View
   const ListView = () => (
     <div className="space-y-6">
-      {SCHEDULE.map((day) => {
+      {schedule.map((day) => {
         const todayIndex = currentTime.getDay() - 1;
         const isToday = day.dayIndex === todayIndex;
         
@@ -144,7 +145,7 @@ const FullScheduleView: React.FC<FullScheduleViewProps> = ({ links, currentTime 
     
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {SCHEDULE.map((day) => {
+        {schedule.map((day) => {
           const isToday = day.dayIndex === todayIndex;
           
           return (
@@ -236,7 +237,7 @@ const FullScheduleView: React.FC<FullScheduleViewProps> = ({ links, currentTime 
                 <tr key={slot.id} className="border-t border-[#2a2a4a] hover:bg-[#252545]/50 transition-colors">
                   <td className="p-3 font-medium text-gray-500">{index + 1}</td>
                   <td className="p-3 text-sm text-gray-500 whitespace-nowrap">{slot.start}</td>
-                  {SCHEDULE.map((day) => {
+                  {schedule.map((day) => {
                     const lesson = day.lessons[index];
                     const status = getLessonStatus(day.dayIndex, index);
                     const isToday = day.dayIndex === todayIndex;
